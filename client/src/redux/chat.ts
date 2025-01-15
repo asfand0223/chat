@@ -1,16 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+export type Message = {
+  id: string;
+  content: string;
+};
+
 interface IInitialState {
-  chatInput: string;
+  chat_input: string;
+  messages: Array<Message>;
 }
 
 const initialState: IInitialState = {
-  chatInput: "",
+  chat_input: "",
+  messages: [],
 };
 
 interface ISetChatInputPayload {
-  chatInput: string;
+  chat_input: string;
+}
+
+interface IAddMessage {
+  message: Message;
 }
 
 export const chatSlice = createSlice({
@@ -21,10 +32,13 @@ export const chatSlice = createSlice({
       state: IInitialState,
       action: PayloadAction<ISetChatInputPayload>,
     ) => {
-      state.chatInput = action.payload.chatInput;
+      state.chat_input = action.payload.chat_input;
+    },
+    addMessage(state: IInitialState, action: PayloadAction<IAddMessage>) {
+      state.messages = [...state.messages, action.payload.message];
     },
   },
 });
 
-export const { setChatInput } = chatSlice.actions;
+export const { setChatInput, addMessage } = chatSlice.actions;
 export const chatReducer = chatSlice.reducer;
