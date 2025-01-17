@@ -30,9 +30,16 @@ const ChatInput: React.FC<IChatInputProps> = ({ maxRows }) => {
     dispatch(setChatInput({ chat_input: e.target.value }));
   };
   const handleSubmit = async () => {
-    if (chat_input.length <= 0 || !connection || !connection.connectionId)
+    if (
+      chat_input.trim().length <= 0 ||
+      !connection ||
+      !connection.connectionId
+    )
       return;
     dispatch(setChatInput({ chat_input: "" }));
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+    }
     await sendMessage({
       connectionId: connection.connectionId,
       message: chat_input,
@@ -48,7 +55,7 @@ const ChatInput: React.FC<IChatInputProps> = ({ maxRows }) => {
         className={styles.textarea}
       ></textarea>
       <button
-        className={`${styles.sendButton} ${chat_input.length <= 0 && styles.disabled}`}
+        className={`${styles.sendButton} ${chat_input.trim().length <= 0 && styles.disabled}`}
         onClick={handleSubmit}
       >
         Send

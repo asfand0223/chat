@@ -87,7 +87,7 @@ namespace Chat.Chat
 
                     await Clients
                         .Group(GroupId.ToString())
-                        .SendAsync("RemoveConnectionIds", connections.ToList());
+                        .SendAsync("RemoveConnectionId", Context.ConnectionId);
                 }
             }
             catch (Exception ex)

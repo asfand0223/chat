@@ -4,6 +4,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 export type Message = {
   id: string;
   content: string;
+  rgb: string;
 };
 
 interface IInitialState {

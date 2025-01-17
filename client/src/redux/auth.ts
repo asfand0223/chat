@@ -1,3 +1,4 @@
+import { generateRandomRGB } from "@/utils/rgb";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -16,16 +17,16 @@ const initialState: IInitialState = {
   user_id: null,
 };
 
-interface IAddUser {
-  user: User;
+interface IAddUsers {
+  connection_ids: Array<string>;
 }
 
 interface ISetUserId {
   user_id: string;
 }
 
-interface IRemoveUsers {
-  connection_ids: Array<string>;
+interface IRemoveUser {
+  connection_id: string;
 }
 
 export const userSlice = createSlice({
@@ -35,18 +36,21 @@ export const userSlice = createSlice({
     setUserId(state: IInitialState, action: PayloadAction<ISetUserId>) {
       state.user_id = action.payload.user_id;
     },
-    addUser(state: IInitialState, action: PayloadAction<IAddUser>) {
-      const user = action.payload.user;
-      if (state.users.find((u: User) => u.id === user.id)) return;
-      state.users = [...state.users, user];
+    addUsers(state: IInitialState, action: PayloadAction<IAddUsers>) {
+      const connection_ids = action.payload.connection_ids;
+      connection_ids
+        .filter((cid: string) => !state.users.find((u: User) => u.id === cid))
+        .map((cid: string) => {
+          state.users = [...state.users, { id: cid, rgb: generateRandomRGB() }];
+        });
     },
-    removeUsers(state: IInitialState, action: PayloadAction<IRemoveUsers>) {
-      state.users = state.users.filter((u: User) =>
-        action.payload.connection_ids.includes(u.id),
+    removeUser(state: IInitialState, action: PayloadAction<IRemoveUser>) {
+      state.users = state.users.filter(
+        (u: User) => action.payload.connection_id !== u.id,
       );
     },
   },
 });
 
-export const { setUserId, addUser, removeUsers } = userSlice.actions;
+export const { setUserId, addUsers, removeUser } = userSlice.actions;
 export const authReducer = userSlice.reducer;

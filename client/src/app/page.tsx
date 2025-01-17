@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Chat from "@/components/Chat";
 import {
   getSignalRConnection,
@@ -8,22 +8,25 @@ import {
 } from "@/utils/signalr";
 import { addMessage } from "@/redux/chat";
 import { useDispatch } from "react-redux";
-import { generateRandomRGB } from "@/utils/rgb";
-import { addUser, removeUsers } from "@/redux/auth";
+import { addUsers, removeUser, User } from "@/redux/auth";
 import styles from "./page.module.scss";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const Home = () => {
   const dispatch = useDispatch();
   const hubUrl = "http://localhost:5000/chat";
-
+  const { users } = useSelector((state: RootState) => state.auth);
+  const usersRef = useRef<User[]>(users);
+  useEffect(() => {
+    usersRef.current = users;
+  }, [users]);
   useEffect(() => {
     const connectToSignalR = async () => {
       const connection = await startSignalRConnection(hubUrl);
 
       if (connection) {
         await joinGroup();
-        if (connection && connection.connectionId) {
-        }
         connection.on(
           "ReceiveMessage",
           (connection_id: string, message: string) => {
@@ -32,6 +35,9 @@ const Home = () => {
                 message: {
                   id: connection_id,
                   content: message,
+                  rgb:
+                    usersRef.current.find((u: User) => u.id === connection_id)
+                      ?.rgb || "rgb(0, 0, 0)",
                 },
               }),
             );
@@ -40,28 +46,20 @@ const Home = () => {
         connection.on(
           "ReceiveConnectionIds",
           (connection_ids: Array<string>) => {
-            connection_ids.map((cid: string) => {
-              dispatch(
-                addUser({
-                  user: {
-                    id: cid,
-                    rgb: generateRandomRGB(),
-                  },
-                }),
-              );
-            });
-          },
-        );
-        connection.on(
-          "RemoveConnectionIds",
-          (connection_ids: Array<string>) => {
             dispatch(
-              removeUsers({
+              addUsers({
                 connection_ids,
               }),
             );
           },
         );
+        connection.on("RemoveConnectionId", (connection_id: string) => {
+          dispatch(
+            removeUser({
+              connection_id,
+            }),
+          );
+        });
       }
       await connection.invoke("GetConnectionIds");
     };
