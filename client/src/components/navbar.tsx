@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./styles.module.scss";
+import styles from "../styles/navbar.module.scss";
 
 const Navbar: React.FC = () => {
   return (

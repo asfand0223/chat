@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Chat from "@/components/Chat";
+import Chat from "../components/chat/chat";
 import {
   getSignalRConnection,
   joinGroup,
@@ -9,9 +9,9 @@ import {
 import { addMessage } from "@/redux/chat";
 import { useDispatch } from "react-redux";
 import { addUsers, removeUser, User } from "@/redux/auth";
-import styles from "./page.module.scss";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import styles from "./page.module.scss";
 
 const Home = () => {
   const dispatch = useDispatch();

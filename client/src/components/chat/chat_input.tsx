@@ -3,9 +3,9 @@ import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import styles from "./styles.module.scss";
 import { setChatInput } from "@/redux/chat";
 import { getSignalRConnection, sendMessage } from "@/utils/signalr";
+import styles from "../../styles/chat/chat_input.module.scss";
 
 interface IChatInputProps {
   maxRows: number;

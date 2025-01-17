@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import styles from "./styles.module.scss";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { Message as M } from "@/redux/chat";
-import Message from "./Message";
+import Message from "./message";
+import styles from "../../styles/chat/messages.module.scss";
 
 const Messages = () => {
   const { messages, chat_input } = useSelector(

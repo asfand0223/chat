@@ -1,6 +1,6 @@
 import React from "react";
 import { Message as M } from "@/redux/chat";
-import styles from "./styles.module.scss";
+import styles from "../../styles/chat/message.module.scss";
 
 type IMessageProps = {
   message: M;
