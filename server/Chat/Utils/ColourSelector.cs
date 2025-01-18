@@ -57,7 +57,6 @@ namespace Chat.Utils
 
         public static string GetRandom()
         {
-            Console.WriteLine(Colours.Count);
             int index = rnd.Next(0, Colours.Count);
             return Colours[index];
         }
