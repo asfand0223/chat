@@ -1,28 +1,49 @@
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Chat.Chat
+namespace Chat.SignalR
 {
     public class ChatHub : Hub
     {
-        public static Guid GroupId = Guid.NewGuid();
-        private static readonly ConcurrentDictionary<Guid, HashSet<string>> GroupConnections =
+        private static readonly ConcurrentDictionary<string, HashSet<Chatter>> ChatterGroups =
             new();
+        private static readonly HashSet<string> ChatterColours = new()
+        {
+            "#FF0000",
+            "#FF6F00",
+            "#00FF00",
+            "#0000FF",
+            "6600FF",
+            "6A00FF",
+        };
 
-        public async Task JoinGroup()
+        public async Task JoinGroup(string group)
         {
             try
             {
-                GroupConnections.AddOrUpdate(
-                    GroupId,
-                    _ => new HashSet<string> { Context.ConnectionId },
+                Chatter newChatter = new Chatter
+                {
+                    Group = group,
+                    ConnectionId = Context.ConnectionId,
+                    Colour = "#FF0000",
+                };
+
+                ChatterGroups.AddOrUpdate(
+                    group,
+                    _ => new HashSet<Chatter> { newChatter },
                     (_, existing) =>
                     {
-                        existing.Add(Context.ConnectionId);
+                        Chatter? existingChatter = existing.FirstOrDefault(
+                            (Chatter c) => c.ConnectionId == newChatter.ConnectionId
+                        );
+                        if (existingChatter == null)
+                            existing.Add(newChatter);
                         return existing;
                     }
                 );
-                await Groups.AddToGroupAsync(Context.ConnectionId, GroupId.ToString());
+                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+
+                await ChatterJoined(group, newChatter);
             }
             catch (Exception ex)
             {
@@ -30,20 +51,29 @@ namespace Chat.Chat
             }
         }
 
-        public async Task GetConnectionIds()
+        public async Task ChatterJoined(string group, Chatter chatter)
         {
             try
             {
-                if (GroupConnections.TryGetValue(GroupId, out var connections))
-                {
-                    await Clients
-                        .Group(GroupId.ToString())
-                        .SendAsync("ReceiveConnectionIds", connections.ToList());
-                }
+                await Clients.Group(group).SendAsync("ChatterJoined", chatter);
+                await SendChatters(group);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetConnectionIds: " + ex);
+                Console.WriteLine("ChatterJoined: " + ex);
+            }
+        }
+
+        public async Task SendChatters(string group)
+        {
+            try
+            {
+                List<Chatter> chatters = ChatterGroups[group].ToList();
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveChatters", chatters);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GetChatters: " + ex);
             }
         }
 
@@ -63,32 +93,36 @@ namespace Chat.Chat
         {
             try
             {
-                foreach (var groupId in GroupConnections.Keys)
+                // Find chatter that left
+                Chatter? chatterToRemove = null;
+                foreach (var cgs in ChatterGroups)
                 {
-                    GroupConnections.AddOrUpdate(
-                        groupId,
-                        _ => new HashSet<string>(),
-                        (_, existing) =>
-                        {
-                            existing.Remove(Context.ConnectionId);
-                            return existing;
-                        }
+                    chatterToRemove = cgs.Value.FirstOrDefault(
+                        (Chatter c) => c.ConnectionId == Context.ConnectionId
                     );
                 }
-
-                if (GroupConnections.TryGetValue(GroupId, out var connections))
+                // If chatter that left cannot be found, do nothing
+                if (chatterToRemove == null)
                 {
-                    connections.Remove(Context.ConnectionId);
-
-                    if (connections.Count == 0)
-                    {
-                        GroupConnections.TryRemove(GroupId, out _);
-                    }
-
-                    await Clients
-                        .Group(GroupId.ToString())
-                        .SendAsync("RemoveConnectionId", Context.ConnectionId);
+                    return;
                 }
+                // Remove chatter that left, from group
+                ChatterGroups[chatterToRemove.Group]
+                    .RemoveWhere((Chatter c) => c.ConnectionId == Context.ConnectionId);
+                // Once chatter that left is removed, remove group if no chatters exist
+                HashSet<Chatter> group = ChatterGroups[chatterToRemove.Group];
+                if (group.Count == 0)
+                {
+                    ChatterGroups.Remove<string, HashSet<Chatter>>(
+                        chatterToRemove.Group,
+                        out HashSet<Chatter>? _
+                    );
+                }
+                await Clients
+                    .Group(chatterToRemove.Group)
+                    .SendAsync("RemoveChatter", chatterToRemove.ConnectionId);
+                //To be safe, call base OnDisconnectedAsync too
+                await base.OnDisconnectedAsync(exception);
             }
             catch (Exception ex)
             {

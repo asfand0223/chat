@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { chatReducer } from "./chat";
-import { authReducer } from "./auth";
+import { chat_reducer } from "./chat";
+import { chat_hub_reducer } from "./chat_hub";
 
 export const store = configureStore({
-  reducer: { auth: authReducer, chat: chatReducer },
+  reducer: { chat_hub: chat_hub_reducer, chat: chat_reducer },
   devTools: process.env.NODE_ENV !== "production",
 });
 

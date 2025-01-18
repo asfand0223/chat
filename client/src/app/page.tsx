@@ -8,25 +8,37 @@ import {
 } from "@/utils/signalr";
 import { addMessage } from "@/redux/chat";
 import { useDispatch } from "react-redux";
-import { addUsers, removeUser, User } from "@/redux/auth";
+import {
+  removeChatter,
+  Chatter,
+  addChatter,
+  addChatters,
+} from "@/redux/chat_hub";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import styles from "./page.module.scss";
 
 const Home = () => {
+  const group = "Chat";
   const dispatch = useDispatch();
   const hubUrl = "http://localhost:5000/chat";
-  const { users } = useSelector((state: RootState) => state.auth);
-  const usersRef = useRef<User[]>(users);
-  useEffect(() => {
-    usersRef.current = users;
-  }, [users]);
-  useEffect(() => {
-    const connectToSignalR = async () => {
-      const connection = await startSignalRConnection(hubUrl);
+  const { chatters } = useSelector((state: RootState) => state.chat_hub);
+  const chattersRef = useRef<Array<Chatter>>(chatters);
 
-      if (connection) {
-        await joinGroup();
+  useEffect(() => {
+    chattersRef.current = chatters;
+  }, [chatters]);
+
+  useEffect(() => {
+    const startSignalRConnectionAsync = async () => {
+      try {
+        const connection = await startSignalRConnection(hubUrl);
+
+        if (!connection) return;
+
+        connection.on("ChatterJoined", (chatter) => {
+          dispatch(addChatter({ chatter }));
+        });
         connection.on(
           "ReceiveMessage",
           (connection_id: string, message: string) => {
@@ -36,42 +48,37 @@ const Home = () => {
                   id: connection_id,
                   content: message,
                   rgb:
-                    usersRef.current.find((u: User) => u.id === connection_id)
-                      ?.rgb || "rgb(0, 0, 0)",
+                    chattersRef.current.find(
+                      (c: Chatter) => c.connection_id === connection_id,
+                    )?.colour || "rgb(0, 0, 0)",
                 },
               }),
             );
           },
         );
-        connection.on(
-          "ReceiveConnectionIds",
-          (connection_ids: Array<string>) => {
-            dispatch(
-              addUsers({
-                connection_ids,
-              }),
-            );
-          },
-        );
-        connection.on("RemoveConnectionId", (connection_id: string) => {
+        connection.on("RemoveChatter", (connection_id: string) => {
           dispatch(
-            removeUser({
+            removeChatter({
               connection_id,
             }),
           );
         });
+        connection.on("ReceiveChatters", (chatters) => {
+          dispatch(addChatters({ chatters }));
+        });
+        await joinGroup({ group });
+      } catch (error) {
+        console.error("Start SignalR connection:", error);
       }
-      await connection.invoke("GetConnectionIds");
     };
 
-    connectToSignalR();
+    startSignalRConnectionAsync();
+
     return () => {
-      const connection = getSignalRConnection();
-      if (connection) {
-        connection.stop();
-      }
+      getSignalRConnection()?.stop();
     };
   }, []);
+
   return (
     <div className={styles.container}>
       <Chat />

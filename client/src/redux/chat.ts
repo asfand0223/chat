@@ -42,4 +42,4 @@ export const chatSlice = createSlice({
 });
 
 export const { setChatInput, addMessage } = chatSlice.actions;
-export const chatReducer = chatSlice.reducer;
+export const chat_reducer = chatSlice.reducer;

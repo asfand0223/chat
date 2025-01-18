@@ -22,11 +22,15 @@ export const startSignalRConnection = async (
   return connection;
 };
 
-export const joinGroup = async () => {
+interface IJoinGroupParams {
+  group: string;
+}
+
+export const joinGroup = async ({ group }: IJoinGroupParams) => {
   const connection = getSignalRConnection();
   if (connection) {
     try {
-      await connection.invoke("JoinGroup");
+      await connection.invoke("JoinGroup", group);
     } catch (error) {
       console.error("JoinGroup Error:", error);
     }

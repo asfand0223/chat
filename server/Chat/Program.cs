@@ -1,7 +1,8 @@
-﻿using Chat.Chat;
-using Chat.Configuration;
+﻿using Chat.Configuration;
 using Chat.Database;
+using Chat.Interfaces;
 using Chat.Repositories;
+using Chat.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,6 +1,6 @@
 using Chat.Models;
 
-namespace Chat.Repositories
+namespace Chat.Interfaces
 {
     public interface IMessageRepository
     {

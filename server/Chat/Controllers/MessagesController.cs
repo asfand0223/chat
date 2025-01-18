@@ -1,5 +1,5 @@
 using Chat.DTOs;
-using Chat.Repositories;
+using Chat.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chat.Controllers

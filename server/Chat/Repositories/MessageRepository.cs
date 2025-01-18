@@ -1,4 +1,5 @@
 using Chat.Database;
+using Chat.Interfaces;
 using Chat.Models;
 using Microsoft.EntityFrameworkCore;
 
