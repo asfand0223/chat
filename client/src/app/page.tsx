@@ -42,6 +42,11 @@ const Home = () => {
         connection.on(
           "ReceiveMessage",
           (connection_id: string, message: string) => {
+            console.log(
+              chattersRef.current.find(
+                (c: Chatter) => c.connection_id === connection_id,
+              )?.colour,
+            );
             dispatch(
               addMessage({
                 message: {

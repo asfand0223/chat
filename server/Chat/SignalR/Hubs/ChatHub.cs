@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Chat.Utils;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.SignalR
@@ -25,7 +26,7 @@ namespace Chat.SignalR
                 {
                     Group = group,
                     ConnectionId = Context.ConnectionId,
-                    Colour = "#FF0000",
+                    Colour = ColourSelector.GetRandom(),
                 };
 
                 ChatterGroups.AddOrUpdate(
