@@ -82,7 +82,7 @@ const Home = () => {
     return () => {
       getSignalRConnection()?.stop();
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.container}>

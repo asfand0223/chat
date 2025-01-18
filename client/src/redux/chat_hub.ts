@@ -1,4 +1,3 @@
-import { HubConnection } from "@microsoft/signalr";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
