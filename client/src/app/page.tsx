@@ -21,7 +21,7 @@ import styles from "./page.module.scss";
 const Home = () => {
   const group = "Chat";
   const dispatch = useDispatch();
-  const hubUrl = "http://localhost:6001/chat";
+  const hubUrl = `${process.env.NEXT_PUBLIC_CHAT_HUB_URL as string}/chat`;
   const { chatters } = useSelector((state: RootState) => state.chat_hub);
   const chattersRef = useRef<Array<Chatter>>(chatters);
 

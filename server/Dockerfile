@@ -11,5 +11,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
 WORKDIR /app
 COPY --from=build /app/out .
-EXPOSE 6001
+EXPOSE 5000
 ENTRYPOINT ["dotnet", "Chat.dll"]
