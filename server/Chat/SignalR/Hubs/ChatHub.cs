@@ -8,15 +8,6 @@ namespace Chat.SignalR
     {
         private static readonly ConcurrentDictionary<string, HashSet<Chatter>> ChatterGroups =
             new();
-        private static readonly HashSet<string> ChatterColours = new()
-        {
-            "#FF0000",
-            "#FF6F00",
-            "#00FF00",
-            "#0000FF",
-            "6600FF",
-            "6A00FF",
-        };
 
         public async Task JoinGroup(string group)
         {

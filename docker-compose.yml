@@ -1,0 +1,25 @@
+services:
+  # Frontend service
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    networks:
+      - chat-network
+  # Backend service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "6001:6001"
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    driver: bridge

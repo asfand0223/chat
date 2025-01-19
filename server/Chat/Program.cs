@@ -6,8 +6,7 @@ using Chat.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-string? allowedUrlsString = builder.Configuration["AllowedUrls"];
+string? allowedUrlsString = builder.Configuration.GetValue<string>("AllowedUrls");
 string[] allowedUrls =
     allowedUrlsString?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
@@ -15,11 +14,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(
         "AllowedUrls",
         builder =>
-            builder
-                .WithOrigins("http://localhost:3000")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials()
+            builder.WithOrigins(allowedUrls).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
     );
 });
 builder.Services.AddSignalR();

@@ -21,7 +21,7 @@ import styles from "./page.module.scss";
 const Home = () => {
   const group = "Chat";
   const dispatch = useDispatch();
-  const hubUrl = "http://localhost:5000/chat";
+  const hubUrl = "http://localhost:6001/chat";
   const { chatters } = useSelector((state: RootState) => state.chat_hub);
   const chattersRef = useRef<Array<Chatter>>(chatters);
 
@@ -42,11 +42,6 @@ const Home = () => {
         connection.on(
           "ReceiveMessage",
           (connection_id: string, message: string) => {
-            console.log(
-              chattersRef.current.find(
-                (c: Chatter) => c.connection_id === connection_id,
-              )?.colour,
-            );
             dispatch(
               addMessage({
                 message: {
