@@ -11,10 +11,10 @@ const Message: React.FC<IMessageProps> = ({ message }) => {
     <div className={styles.message}>
       <span
         style={{
-          color: message.rgb,
+          color: message.colour,
         }}
       >
-        {message.id.toLowerCase()}
+        {message.connection_id.toLowerCase()}
       </span>
       <span>: </span>
       <span>{message.content}</span>

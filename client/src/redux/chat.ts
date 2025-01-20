@@ -2,9 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export type Message = {
-  id: string;
+  connection_id: string;
+  group: string;
   content: string;
-  rgb: string;
+  colour: string;
 };
 
 interface IInitialState {

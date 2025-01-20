@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Chat.Models;
 using Chat.Utils;
 using Microsoft.AspNetCore.SignalR;
 
@@ -35,7 +36,7 @@ namespace Chat.SignalR
                 );
                 await Groups.AddToGroupAsync(Context.ConnectionId, group);
 
-                await ChatterJoined(group, newChatter);
+                await Clients.Client(Context.ConnectionId).SendAsync("JoinedGroup", newChatter);
             }
             catch (Exception ex)
             {
@@ -43,37 +44,11 @@ namespace Chat.SignalR
             }
         }
 
-        public async Task ChatterJoined(string group, Chatter chatter)
+        public async Task SendMessage(Message message)
         {
             try
             {
-                await Clients.Group(group).SendAsync("ChatterJoined", chatter);
-                await SendChatters(group);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ChatterJoined: " + ex);
-            }
-        }
-
-        public async Task SendChatters(string group)
-        {
-            try
-            {
-                List<Chatter> chatters = ChatterGroups[group].ToList();
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveChatters", chatters);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("GetChatters: " + ex);
-            }
-        }
-
-        public async Task SendMessage(string connectionId, string content)
-        {
-            try
-            {
-                await Clients.All.SendAsync("ReceiveMessage", connectionId, content);
+                await Clients.Group(message.Group).SendAsync("ReceiveMessage", message);
             }
             catch (Exception ex)
             {

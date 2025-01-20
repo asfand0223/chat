@@ -8,58 +8,26 @@ export type Chatter = {
 };
 
 interface IInitialState {
-  chatters: Array<Chatter>;
+  chatter: Chatter | null;
 }
 
 const initialState: IInitialState = {
-  chatters: [],
+  chatter: null,
 };
 
-interface IAddChatter {
+interface ISetChatter {
   chatter: Chatter;
-}
-
-interface IAddChatters {
-  chatters: Array<Chatter>;
-}
-
-interface IRemoveChatter {
-  connection_id: string;
 }
 
 export const chatHubSlice = createSlice({
   name: "chatHub",
   initialState,
   reducers: {
-    addChatter(state: IInitialState, action: PayloadAction<IAddChatter>) {
-      const newChatter = action.payload.chatter;
-      if (
-        state.chatters.find(
-          (c: Chatter) => c.connection_id === newChatter.connection_id,
-        )
-      )
-        return;
-      state.chatters = [...state.chatters, newChatter];
-    },
-    addChatters(state: IInitialState, action: PayloadAction<IAddChatters>) {
-      action.payload.chatters
-        .filter(
-          (c: Chatter) =>
-            !state.chatters.find(
-              (x: Chatter) => x.connection_id === c.connection_id,
-            ),
-        )
-        .map((c: Chatter) => {
-          state.chatters = [...state.chatters, c];
-        });
-    },
-    removeChatter(state: IInitialState, action: PayloadAction<IRemoveChatter>) {
-      state.chatters = state.chatters.filter(
-        (c: Chatter) => action.payload.connection_id !== c.connection_id,
-      );
+    setChatter(state: IInitialState, action: PayloadAction<ISetChatter>) {
+      state.chatter = action.payload.chatter;
     },
   },
 });
 
-export const { addChatter, addChatters, removeChatter } = chatHubSlice.actions;
+export const { setChatter } = chatHubSlice.actions;
 export const chat_hub_reducer = chatHubSlice.reducer;

@@ -1,21 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Chat.Models
+namespace Chat.SignalR
 {
-    public class Message
+    public class Chatter
     {
-        [JsonPropertyName("connection_id")]
-        [Required]
-        public required string ConnectionId { get; set; }
-
         [JsonPropertyName("group")]
         [Required]
         public required string Group { get; set; }
 
-        [JsonPropertyName("content")]
+        [JsonPropertyName("connection_id")]
         [Required]
-        public required string Content { get; set; }
+        public required string ConnectionId { get; set; }
 
         [JsonPropertyName("colour")]
         [Required]

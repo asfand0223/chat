@@ -1,9 +1,5 @@
 ﻿using Chat.Configuration;
-using Chat.Database;
-using Chat.Interfaces;
-using Chat.Repositories;
 using Chat.SignalR;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 string? allowedUrlsString = builder.Configuration.GetValue<string>("AllowedUrls");
@@ -20,10 +16,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.Configure<Config>(builder.Configuration);
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 var app = builder.Build();
 

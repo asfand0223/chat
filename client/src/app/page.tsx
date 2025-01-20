@@ -1,33 +1,20 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Chat from "../components/chat/chat";
 import {
   getSignalRConnection,
   joinGroup,
   startSignalRConnection,
 } from "@/utils/signalr";
-import { addMessage } from "@/redux/chat";
+import { addMessage, Message } from "@/redux/chat";
 import { useDispatch } from "react-redux";
-import {
-  removeChatter,
-  Chatter,
-  addChatter,
-  addChatters,
-} from "@/redux/chat_hub";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { Chatter, setChatter } from "@/redux/chat_hub";
 import styles from "./page.module.scss";
 
 const Home = () => {
   const group = "Chat";
   const dispatch = useDispatch();
   const hubUrl = `${process.env.NEXT_PUBLIC_CHAT_HUB_URL as string}/chat`;
-  const { chatters } = useSelector((state: RootState) => state.chat_hub);
-  const chattersRef = useRef<Array<Chatter>>(chatters);
-
-  useEffect(() => {
-    chattersRef.current = chatters;
-  }, [chatters]);
 
   useEffect(() => {
     const startSignalRConnectionAsync = async () => {
@@ -36,35 +23,15 @@ const Home = () => {
 
         if (!connection) return;
 
-        connection.on("ChatterJoined", (chatter) => {
-          dispatch(addChatter({ chatter }));
+        connection.on("JoinedGroup", (chatter: Chatter) => {
+          dispatch(setChatter({ chatter }));
         });
-        connection.on(
-          "ReceiveMessage",
-          (connection_id: string, message: string) => {
-            dispatch(
-              addMessage({
-                message: {
-                  id: connection_id,
-                  content: message,
-                  rgb:
-                    chattersRef.current.find(
-                      (c: Chatter) => c.connection_id === connection_id,
-                    )?.colour || "rgb(0, 0, 0)",
-                },
-              }),
-            );
-          },
-        );
-        connection.on("RemoveChatter", (connection_id: string) => {
+        connection.on("ReceiveMessage", (message: Message) => {
           dispatch(
-            removeChatter({
-              connection_id,
+            addMessage({
+              message,
             }),
           );
-        });
-        connection.on("ReceiveChatters", (chatters) => {
-          dispatch(addChatters({ chatters }));
         });
         await joinGroup({ group });
       } catch (error) {

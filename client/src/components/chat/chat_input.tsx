@@ -14,6 +14,7 @@ interface IChatInputProps {
 const ChatInput: React.FC<IChatInputProps> = ({ maxRows }) => {
   const connection = getSignalRConnection();
   const { chat_input } = useSelector((state: RootState) => state.chat);
+  const { chatter } = useSelector((state: RootState) => state.chat_hub);
   const dispatch = useDispatch();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const handletextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,6 +32,7 @@ const ChatInput: React.FC<IChatInputProps> = ({ maxRows }) => {
   };
   const handleSubmit = async () => {
     if (
+      !chatter ||
       chat_input.trim().length <= 0 ||
       !connection ||
       !connection.connectionId
@@ -41,8 +43,12 @@ const ChatInput: React.FC<IChatInputProps> = ({ maxRows }) => {
       textAreaRef.current.style.height = "auto";
     }
     await sendMessage({
-      connectionId: connection.connectionId,
-      message: chat_input,
+      message: {
+        connection_id: chatter.connection_id,
+        group: chatter.group,
+        content: chat_input,
+        colour: chatter.colour,
+      },
     });
   };
   return (

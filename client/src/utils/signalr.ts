@@ -1,3 +1,4 @@
+import { Message } from "@/redux/chat";
 import * as signalR from "@microsoft/signalr";
 
 let connection: signalR.HubConnection | null = null;
@@ -38,18 +39,14 @@ export const joinGroup = async ({ group }: IJoinGroupParams) => {
 };
 
 interface ISendMessageParams {
-  connectionId: string;
-  message: string;
+  message: Message;
 }
 
-export const sendMessage = async ({
-  connectionId,
-  message,
-}: ISendMessageParams) => {
+export const sendMessage = async ({ message }: ISendMessageParams) => {
   const connection = getSignalRConnection();
   if (connection) {
     try {
-      await connection.invoke("SendMessage", connectionId, message);
+      await connection.invoke("SendMessage", message);
     } catch (error) {
       console.error("SendMessage Error:", error);
     }

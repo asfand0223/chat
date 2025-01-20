@@ -2,13 +2,8 @@ namespace Chat.Configuration
 {
     public class Config
     {
-        public ConnectionStrings? ConnectionStrings { get; set; }
+        public string[]? AllowedUrls { get; set; }
         public KestrelSettings? Kestrel { get; set; }
-    }
-
-    public class ConnectionStrings
-    {
-        public string? DefaultConnection { get; set; }
     }
 
     public class KestrelSettings
