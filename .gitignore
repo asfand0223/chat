@@ -1,2 +1,5 @@
 server/Chat/bin
 server/Chat/obj
+
+client/node_modules
+client/.next
