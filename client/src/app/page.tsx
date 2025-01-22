@@ -44,7 +44,7 @@ const Home = () => {
     return () => {
       getSignalRConnection()?.stop();
     };
-  }, [dispatch]);
+  }, [hubUrl, dispatch]);
 
   return (
     <div className={styles.container}>
